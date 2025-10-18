@@ -1,8 +1,0 @@
-1. TMDB API (Use this to fetch movie details for the search bar)
-API Read Access Token: eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyOTIyZDI2YWVlZGNkMGJmZGYyOTQwZDkzMjJhOTM2ZSIsIm5iZiI6MTc2MDc2NjgzMS42NDEsInN1YiI6IjY4ZjMyYjZmNWVjOGEyMjllZTc4ZGUyMCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.4-n9sylfThFvUYmZlsocBmfJc_K07BFcq4og7l39GX0
-
-API Key: 2922d26aeedcd0bfdf2940d9322a936e
-
-2. Use render to deploy it
-https://dashboard.render.com/web/new?newUser=true
-
