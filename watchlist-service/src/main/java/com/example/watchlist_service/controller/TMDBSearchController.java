@@ -20,8 +20,13 @@ public class TMDBSearchController {
         this.tmdbService = tmdbService;
     }
 
-    @GetMapping("/search/{query}")
+    @GetMapping("/search/movie/{query}")
     public List<Movie> searchMovies(@PathVariable String query) {
         return tmdbService.searchMovies(query);
+    }
+
+    @GetMapping("search/tv/{query}")
+    public List<Movie> searchTVShows(@PathVariable String query) {
+        return tmdbService.searchTVShows(query);
     }
 }
