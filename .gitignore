@@ -1,3 +1,9 @@
 # Sensitive information
 notes.txt
-*.txt
+test.json
+
+# Configuration
+application.properties
+
+# PHP API code
+php_api
