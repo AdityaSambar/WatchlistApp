@@ -50,4 +50,12 @@ public class MovieWatchlistDBController {
     public boolean deleteMovie(@PathVariable Long tmdbId) {
         return databaseService.deleteMovie(tmdbId);
     }
+
+    /*
+     * For health checks
+     */
+    @GetMapping("/health")
+    public boolean healthCheck() {
+        return true;
+    }
 }
