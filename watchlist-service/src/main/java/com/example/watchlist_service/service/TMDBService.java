@@ -147,7 +147,7 @@ public class TMDBService {
                             movie.setTitle((String) movieMap.get("original_name"));
                             movie.setOverview((String) movieMap.get("overview"));
                             movie.setPosterPath((String) movieMap.get("poster_path"));
-                            movie.setReleaseDate((String) movieMap.get("release_date"));
+                            movie.setReleaseDate((String) movieMap.get("first_air_date"));
 
                             Object voteAvg = movieMap.get("vote_average");
                             if (voteAvg instanceof Number)
