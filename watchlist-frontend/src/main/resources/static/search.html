@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Search 🎥</title>
+    <style>
+        /* Floating heart animation */
+        .heart {
+            position: absolute;
+            font-size: 20px;
+            color: #ff69b4;
+            animation: floatUp 1s ease-out forwards;
+            pointer-events: none;
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: translateY(-30px) scale(1.3);
+                opacity: 0.9;
+            }
+
+            100% {
+                transform: translateY(-60px) scale(0.8);
+                opacity: 0;
+            }
+        }
+
+
+        /* --- Background Gradient --- */
+        body {
+            background: linear-gradient(to right, #DD5E89 0%, #F7BB97 100%);
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* --- Button Gradient --- */
+        .btn-grad {
+            background-image: linear-gradient(to right, #DD5E89 0%, #F7BB97 51%, #DD5E89 100%);
+            margin: 10px;
+            padding: 15px 45px;
+            text-align: center;
+            text-transform: uppercase;
+            transition: 0.5s;
+            background-size: 200% auto;
+            color: white;
+            box-shadow: 0 0 20px rgba(221, 94, 137, 0.5);
+            border-radius: 10px;
+            border: none;
+            display: inline-block;
+            cursor: pointer;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .btn-grad:hover {
+            background-position: right center;
+            text-decoration: none;
+            color: #fff;
+            transform: scale(1.05);
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.2em;
+            margin-bottom: 20px;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 25px;
+            gap: 10px;
+        }
+
+        .search-bar {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        input[type="text"] {
+            width: 300px;
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
+            outline: none;
+            font-size: 1em;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        select {
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            outline: none;
+            font-size: 1em;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .watchlist-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 25px;
+            justify-items: center;
+            padding: 0 20px;
+        }
+
+        .movie-card {
+            position: relative;
+            width: 180px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .movie-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.6);
+        }
+
+        .poster {
+            width: 100%;
+            height: 270px;
+            object-fit: cover;
+        }
+
+        .title {
+            padding: 10px;
+            text-align: center;
+            font-size: 1em;
+            background: rgba(191, 126, 218, 0.7);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .add-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(0, 255, 0, 0.8);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 18px;
+            width: 28px;
+            height: 28px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .movie-card:hover .add-btn {
+            opacity: 1;
+        }
+
+        .add-btn:hover {
+            background: #00e600;
+        }
+
+        #message {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 1.1em;
+            color: #ffe082;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🔍 Search Movies or TV Shows</h1>
+
+    <div class="top-bar">
+        <button class="btn-grad" onclick="window.location.href='index.html'">🏠 Back to Home</button>
+        <button class="btn-grad" onclick="window.location.href='watchlist.html'">🎞️ View Watchlist</button>
+    </div>
+
+    <div class="search-bar">
+        <select id="typeSelect">
+            <option value="movie">🎬 Movie</option>
+            <option value="tv">📺 TV Show</option>
+        </select>
+        <input type="text" id="searchInput" placeholder="Enter title to search...">
+        <button class="btn-grad" onclick="performSearch()">Search</button>
+    </div>
+
+    <div class="watchlist-grid" id="resultsContainer"></div>
+    <p id="message"></p>
+
+    <script>
+        const baseUrl = "https://watchlistapp-bk70.onrender.com/tmdb/search/";
+        const addUrl = "https://watchlistapp-bk70.onrender.com/watchlist/add";
+
+        async function performSearch() {
+            const query = document.getElementById("searchInput").value.trim();
+            const type = document.getElementById("typeSelect").value;
+            const message = document.getElementById("message");
+            const container = document.getElementById("resultsContainer");
+
+            if (!query) {
+                message.textContent = "Please enter a search query!";
+                return;
+            }
+
+            message.textContent = "Searching...";
+            container.innerHTML = "";
+
+            try {
+                const res = await fetch(`${baseUrl}${type}/${encodeURIComponent(query)}`);
+                if (!res.ok) throw new Error("Failed to fetch results");
+
+                const movies = await res.json();
+                message.textContent = "";
+
+                if (movies.length === 0) {
+                    message.textContent = "No results found 😔";
+                    return;
+                }
+
+                movies.forEach(movie => {
+                    const card = document.createElement("div");
+                    card.classList.add("movie-card");
+
+                    const poster = document.createElement("img");
+                    poster.classList.add("poster");
+                    poster.src = movie.posterPath
+                        ? `https://image.tmdb.org/t/p/w200${movie.posterPath}`
+                        : "https://via.placeholder.com/200x300?text=No+Image";
+                    poster.alt = movie.title || movie.name;
+
+                    const title = document.createElement("div");
+                    title.classList.add("title");
+                    title.textContent = movie.title || movie.name;
+                    title.title = movie.title || movie.name;
+
+                    const addBtn = document.createElement("button");
+                    addBtn.classList.add("add-btn");
+                    addBtn.innerHTML = "+";
+                    addBtn.onclick = async () => {
+                        await addToWatchlist(movie, event);
+                    };
+
+                    card.appendChild(addBtn);
+                    card.appendChild(poster);
+                    card.appendChild(title);
+                    container.appendChild(card);
+                });
+            } catch (err) {
+                console.error("Search error:", err);
+                message.textContent = "⚠️ Failed to fetch search results.";
+            }
+        }
+
+        async function addToWatchlist(movie, event) {
+            try {
+                const res = await fetch("https://watchlistapp-bk70.onrender.com/watchlist/add", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(movie)
+                });
+
+                if (res.ok) {
+                    showHeartBurst(event);  // Trigger the pink heart animation 💕
+                } else {
+                    console.error("Failed to add to watchlist");
+                }
+            } catch (err) {
+                console.error("Error adding movie:", err);
+            }
+        }
+
+        // 💕 Heart animation function
+        function showHeartBurst(event) {
+            const numHearts = 5;
+            for (let i = 0; i < numHearts; i++) {
+                const heart = document.createElement("div");
+                heart.classList.add("heart");
+                heart.textContent = "💗";
+
+                document.body.appendChild(heart);
+
+                const x = event.clientX;
+                const y = event.clientY;
+
+                heart.style.left = `${x + (Math.random() * 20 - 10)}px`;
+                heart.style.top = `${y + (Math.random() * 20 - 10)}px`;
+                heart.style.animationDelay = `${i * 0.1}s`;
+
+                setTimeout(() => heart.remove(), 1000);
+            }
+        }
+
+
+    </script>
+</body>
+
+</html>

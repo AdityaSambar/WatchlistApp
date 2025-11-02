@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Our Watchlist 🎞️</title>
+    <style>
+        /* --- Background Gradient --- */
+        body {
+            background: linear-gradient(to right, #DD5E89 0%, #F7BB97 100%);
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* --- Button Gradient --- */
+        .btn-grad {
+            background-image: linear-gradient(to right, #DD5E89 0%, #F7BB97 51%, #DD5E89 100%);
+            margin: 10px;
+            padding: 15px 45px;
+            text-align: center;
+            text-transform: uppercase;
+            transition: 0.5s;
+            background-size: 200% auto;
+            color: white;
+            box-shadow: 0 0 20px rgba(221, 94, 137, 0.5);
+            border-radius: 10px;
+            border: none;
+            display: inline-block;
+            cursor: pointer;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .btn-grad:hover {
+            background-position: right center;
+            text-decoration: none;
+            color: #fff;
+            transform: scale(1.05);
+        }
+
+
+        h1 {
+            text-align: center;
+            font-size: 2.2em;
+            margin-bottom: 20px;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 25px;
+        }
+
+        .top-bar button {
+            background: #ff4b5c;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-weight: bold;
+        }
+
+        .top-bar button:hover {
+            background: #e63946;
+            transform: scale(1.05);
+        }
+
+        .watchlist-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 25px;
+            justify-items: center;
+        }
+
+        .movie-card {
+            position: relative;
+            width: 180px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .movie-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.6);
+        }
+
+        .poster {
+            width: 100%;
+            height: 270px;
+            object-fit: cover;
+        }
+
+        .title {
+            padding: 10px;
+            text-align: center;
+            font-size: 1em;
+            background: rgba(191, 126, 218, 0.7);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .delete-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(255, 0, 0, 0.8);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 16px;
+            width: 28px;
+            height: 28px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .movie-card:hover .delete-btn {
+            opacity: 1;
+        }
+
+        .delete-btn:hover {
+            background: red;
+        }
+
+        #message {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 1.1em;
+            color: #ffe082;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🎬 Our Watchlist</h1>
+
+    <div class="top-bar">
+        <button class="btn-grad" onclick="window.location.href='index.html'">🏠 Back to Home</button>
+    </div>
+
+    <div class="watchlist-grid" id="watchlistContainer"></div>
+    <p id="message"></p>
+
+    <script>
+        const apiUrl = "https://watchlistapp-bk70.onrender.com/watchlist/all";
+        const deleteUrl = "https://watchlistapp-bk70.onrender.com/watchlist/delete/";
+
+        async function loadWatchlist() {
+            try {
+                const res = await fetch(apiUrl);
+                const movies = await res.json();
+                const container = document.getElementById("watchlistContainer");
+                const message = document.getElementById("message");
+
+                container.innerHTML = "";
+                message.textContent = "";
+
+                if (!movies || movies.length === 0) {
+                    message.textContent = "WHY SO EMPTYYYY :(";
+                    return;
+                }
+
+                movies.forEach(movie => {
+                    const card = document.createElement("div");
+                    card.classList.add("movie-card");
+
+                    const poster = document.createElement("img");
+                    poster.classList.add("poster");
+                    poster.src = `https://image.tmdb.org/t/p/w200${movie.posterPath}`;
+                    poster.alt = movie.title;
+
+                    const title = document.createElement("div");
+                    title.classList.add("title");
+                    title.textContent = movie.title;
+                    title.title = movie.title; // <-- This shows full name on hover
+
+                    const deleteBtn = document.createElement("button");
+                    deleteBtn.classList.add("delete-btn");
+                    deleteBtn.innerHTML = "&times;";
+                    deleteBtn.onclick = async () => {
+                        await deleteMovie(movie.tmdbId, card);        
+                    };
+
+                    card.appendChild(deleteBtn);
+                    card.appendChild(poster);
+                    card.appendChild(title);
+                    container.appendChild(card);
+                });
+            } catch (err) {
+                console.error("Error fetching watchlist:", err);
+                document.getElementById("message").textContent = "⚠️ Unable to load watchlist.";
+            }
+        }
+
+        async function deleteMovie(tmdbId, card) {
+            try {
+                const res = await fetch(deleteUrl + tmdbId, { method: "DELETE" });
+                if (res.ok) {
+                    card.remove();
+                } else {
+                    alert("❌ Failed to delete movie.");
+                }
+            } catch (err) {
+                console.error("Delete error:", err);
+            }
+        }
+
+        loadWatchlist();
+    </script>
+</body>
+
+</html>
