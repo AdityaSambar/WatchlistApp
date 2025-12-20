@@ -1,5 +1,6 @@
 package com.example.watchlist_service.util;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -9,7 +10,9 @@ import java.util.Random;
 @Component
 public class KeepAliveScheduler {
 
-    private static final String RENDER_URL = "https://watchlistapp-bk70.onrender.com/watchlist/all";
+    @Value("${api.base.url}")
+    private static String RENDER_BASE_URL;
+    private static final String RENDER_URL = RENDER_BASE_URL + "watchlist/all";
     private static final Random RANDOM = new Random();
     
     private final RestTemplate restTemplate = new RestTemplate();
