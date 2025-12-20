@@ -3,6 +3,7 @@ package com.example.watchlist_service.controller;
 import com.example.watchlist_service.dao.Movie;
 import com.example.watchlist_service.service.DatabaseService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,6 +16,9 @@ import java.util.Optional;
 @RequestMapping("/watchlist")
 @CrossOrigin(origins = "*") // allow cross-origin requests (for frontend)
 public class MovieWatchlistDBController {
+
+    @Value("${api.base.url}")
+    private String apiBaseUrl;
 
     @Autowired
     private DatabaseService databaseService;
@@ -57,5 +61,11 @@ public class MovieWatchlistDBController {
     @GetMapping("/health")
     public boolean healthCheck() {
         return true;
+    }
+
+    // FOR TESTING PURPOSES REMOVE THIS
+    @GetMapping("/url")
+    public String getRenderUrl() {
+        return apiBaseUrl;
     }
 }

@@ -11,8 +11,8 @@ import java.util.Random;
 public class KeepAliveScheduler {
 
     @Value("${api.base.url}")
-    private static String RENDER_BASE_URL;
-    private static final String RENDER_URL = RENDER_BASE_URL + "watchlist/all";
+    private String RENDER_BASE_URL;
+
     private static final Random RANDOM = new Random();
     
     private final RestTemplate restTemplate = new RestTemplate();
@@ -29,7 +29,8 @@ public class KeepAliveScheduler {
     @Scheduled(fixedDelayString = "#{T(com.example.watchlist_service.util.KeepAliveScheduler).getRandomDelay()}")
     public void keepAlivePing() {
         try {
-            restTemplate.getForObject(RENDER_URL, String.class);
+            String url = RENDER_BASE_URL + "watchlist/all";
+            restTemplate.getForObject(url, String.class);
             System.out.println("💓 Keep-alive ping sent successfully at " + new java.util.Date());
         } catch (Exception e) {
             System.err.println("⚠️ Keep-alive ping failed: " + e.getMessage());
