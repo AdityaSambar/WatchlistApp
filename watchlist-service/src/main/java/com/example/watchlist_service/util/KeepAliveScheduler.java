@@ -29,7 +29,7 @@ public class KeepAliveScheduler {
     @Scheduled(fixedDelayString = "#{T(com.example.watchlist_service.util.KeepAliveScheduler).getRandomDelay()}")
     public void keepAlivePing() {
         try {
-            String url = RENDER_BASE_URL + "watchlist/all";
+            String url = RENDER_BASE_URL + "watchlist/health";
             restTemplate.getForObject(url, String.class);
             System.out.println("💓 Keep-alive ping sent successfully at " + new java.util.Date());
         } catch (Exception e) {
